@@ -26,8 +26,7 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
             </>
           )}
 
-          {!activeAddress &&
-            wallets?.map((wallet) => (
+          {wallets?.map((wallet) => (
               <button
                 data-test-id={`${wallet.id}-connect`}
                 className="btn border-teal-800 border-1  m-2"
@@ -36,6 +35,11 @@ const ConnectWallet = ({ openModal, closeModal }: ConnectWalletInterface) => {
                 onClick={async (e) => {
                   e.preventDefault()
                   try {
+                    // If a wallet is already active, disconnect it first so user can switch providers.
+                    const activeWallet = wallets.find((w) => w.isActive)
+                    if (activeWallet && activeWallet.id !== wallet.id) {
+                      await activeWallet.disconnect()
+                    }
                     await wallet.connect()
                     closeModal()
                   } catch (err: any) {

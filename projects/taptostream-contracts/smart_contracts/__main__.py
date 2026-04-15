@@ -154,6 +154,14 @@ def build(output_dir: Path, contract_path: Path) -> Path:
                     raise Exception(
                         "Could not generate typed client, requires AlgoKit 2.0.0 or later. Please update AlgoKit"
                     )
+
+                # On Windows, `algokit generate client -l python` requires a `pipx` executable to be on PATH.
+                # Compilation artifacts are still valid without a generated python client, so don't fail the build.
+                if "pipx" in generate_result.stdout:
+                    logger.warning(
+                        "Skipping python typed client generation because pipx executable was not found. "
+                        "Add pipx to PATH to enable client generation."
+                    )
                 else:
                     raise Exception(
                         f"Could not generate typed client:\n{generate_result.stdout}"

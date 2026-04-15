@@ -5,7 +5,7 @@
       "url": "https://algorand-docs.mcp.kapa.ai/"
     },
     "vibekit-mcp": {
-      "command": "/home/shreyash/.local/bin/vibekit",
+      "command": "vibekit",
       "args": [
         "mcp"
       ],

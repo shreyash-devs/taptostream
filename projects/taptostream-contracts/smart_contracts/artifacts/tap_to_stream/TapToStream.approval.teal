@@ -3,26 +3,37 @@
 
 // algopy.arc4.ARC4Contract.approval_program() -> uint64:
 main:
-    // smart_contracts/tap_to_stream/contract.py:6
+    intcblock 0 32 2 8 TMPL_usdc_asset_id
+    bytecblock "platform_wallet" "|" "usdc_asset_id" TMPL_platform_wallet
+    txn ApplicationID
+    bnz main_after_if_else@2
+    // smart_contracts/tap_to_stream/contract.py:14
+    // self.platform_wallet = GlobalState(TemplateVar[Account]("platform_wallet"))
+    bytec_0 // "platform_wallet"
+    bytec_3 // TMPL_platform_wallet
+    app_global_put
+    // smart_contracts/tap_to_stream/contract.py:15
+    // self.usdc_asset_id = GlobalState(TemplateVar[UInt64]("usdc_asset_id"))
+    bytec_2 // "usdc_asset_id"
+    intc 4 // TMPL_usdc_asset_id
+    app_global_put
+
+main_after_if_else@2:
+    // smart_contracts/tap_to_stream/contract.py:12
     // class TapToStream(ARC4Contract):
     txn NumAppArgs
-    bz main___algopy_default_create@5
-    pushbytes 0x02bece11 // method "hello(string)string"
-    txna ApplicationArgs 0
-    match main_hello_route@3
-    err
-
-main_hello_route@3:
-    // smart_contracts/tap_to_stream/contract.py:7
-    // @abimethod()
+    bz main___algopy_default_create@11
     txn OnCompletion
     !
-    txn ApplicationID
-    &&
     assert
-    b hello
+    txn ApplicationID
+    assert
+    pushbytess 0x0d2ab556 0xe002f170 // method "make_payment(string,address,uint64,address)bool", method "distribute_payment(string,address,uint64,address)bool"
+    txna ApplicationArgs 0
+    match make_payment distribute_payment
+    err
 
-main___algopy_default_create@5:
+main___algopy_default_create@11:
     txn OnCompletion
     !
     txn ApplicationID
@@ -31,37 +42,299 @@ main___algopy_default_create@5:
     return
 
 
-// smart_contracts.tap_to_stream.contract.TapToStream.hello[routing]() -> void:
-hello:
-    // smart_contracts/tap_to_stream/contract.py:7
-    // @abimethod()
+// smart_contracts.tap_to_stream.contract.TapToStream.make_payment[routing]() -> void:
+make_payment:
+    // smart_contracts/tap_to_stream/contract.py:17
+    // @arc4.abimethod()
     txna ApplicationArgs 1
     dup
-    pushint 0
+    intc_0 // 0
     extract_uint16 // on error: invalid array length header
-    pushint 2
+    intc_2 // 2
     +
     dig 1
     len
     ==
     assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>
-    extract 2 0
-    // smart_contracts/tap_to_stream/contract.py:9
-    // return "Hello, " + name
-    pushbytes "Hello, "
-    swap
-    concat
-    // smart_contracts/tap_to_stream/contract.py:7
-    // @abimethod()
+    txna ApplicationArgs 2
     dup
     len
-    itob
-    extract 6 2
-    swap
+    intc_1 // 32
+    ==
+    assert // invalid number of bytes for arc4.static_array<arc4.uint8, 32>
+    txna ApplicationArgs 3
+    dup
+    len
+    intc_3 // 8
+    ==
+    assert // invalid number of bytes for arc4.uint64
+    txna ApplicationArgs 4
+    dup
+    len
+    intc_1 // 32
+    ==
+    assert // invalid number of bytes for arc4.static_array<arc4.uint8, 32>
+    // smart_contracts/tap_to_stream/contract.py:25
+    // assert Txn.sender == self.platform_wallet.value
+    txn Sender
+    intc_0 // 0
+    bytec_0 // "platform_wallet"
+    app_global_get_ex
+    assert // check self.platform_wallet exists
+    ==
+    assert
+    // smart_contracts/tap_to_stream/contract.py:26
+    // assert usdc_amount
+    dig 1
+    pushbytes 0x
+    b!=
+    assert
+    // smart_contracts/tap_to_stream/contract.py:30
+    // video_id,
+    pushbytes "payment|"
+    dig 4
     concat
+    // smart_contracts/tap_to_stream/contract.py:31
+    // "|",
+    bytec_1 // "|"
+    concat
+    // smart_contracts/tap_to_stream/contract.py:32
+    // viewer_address,
+    dig 3
+    concat
+    // smart_contracts/tap_to_stream/contract.py:33
+    // "|",
+    bytec_1 // "|"
+    concat
+    // smart_contracts/tap_to_stream/contract.py:34
+    // usdc_amount,
+    dig 2
+    concat
+    // smart_contracts/tap_to_stream/contract.py:35
+    // "|",
+    bytec_1 // "|"
+    concat
+    // smart_contracts/tap_to_stream/contract.py:36
+    // creator_address,
+    dig 1
+    concat
+    // smart_contracts/tap_to_stream/contract.py:37
+    // "|ts=",
+    pushbytes "|ts="
+    concat
+    // smart_contracts/tap_to_stream/contract.py:38
+    // Global.latest_timestamp,
+    global LatestTimestamp
+    itob
+    concat
+    // smart_contracts/tap_to_stream/contract.py:28-39
+    // log(
+    //     "payment|",
+    //     video_id,
+    //     "|",
+    //     viewer_address,
+    //     "|",
+    //     usdc_amount,
+    //     "|",
+    //     creator_address,
+    //     "|ts=",
+    //     Global.latest_timestamp,
+    // )
+    log
+    // smart_contracts/tap_to_stream/contract.py:41-43
+    // distribute_result = self.distribute_payment(
+    //     video_id, viewer_address, usdc_amount, creator_address
+    // )
+    callsub smart_contracts.tap_to_stream.contract.TapToStream.distribute_payment
+    // smart_contracts/tap_to_stream/contract.py:44
+    // assert distribute_result
+    pushbytes 0x00
+    !=
+    assert
+    // smart_contracts/tap_to_stream/contract.py:17
+    // @arc4.abimethod()
+    pushbytes 0x151f7c7580
+    log
+    pushint 1
+    return
+
+
+// smart_contracts.tap_to_stream.contract.TapToStream.distribute_payment[routing]() -> void:
+distribute_payment:
+    // smart_contracts/tap_to_stream/contract.py:47
+    // @arc4.abimethod()
+    txna ApplicationArgs 1
+    dup
+    intc_0 // 0
+    extract_uint16 // on error: invalid array length header
+    intc_2 // 2
+    +
+    dig 1
+    len
+    ==
+    assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>
+    txna ApplicationArgs 2
+    dup
+    len
+    intc_1 // 32
+    ==
+    assert // invalid number of bytes for arc4.static_array<arc4.uint8, 32>
+    txna ApplicationArgs 3
+    dup
+    len
+    intc_3 // 8
+    ==
+    assert // invalid number of bytes for arc4.uint64
+    txna ApplicationArgs 4
+    dup
+    len
+    intc_1 // 32
+    ==
+    assert // invalid number of bytes for arc4.static_array<arc4.uint8, 32>
+    callsub smart_contracts.tap_to_stream.contract.TapToStream.distribute_payment
     pushbytes 0x151f7c75
     swap
     concat
     log
     pushint 1
     return
+
+
+// smart_contracts.tap_to_stream.contract.TapToStream.distribute_payment(video_id: bytes, viewer_address: bytes, usdc_amount: bytes, creator_address: bytes) -> bytes:
+smart_contracts.tap_to_stream.contract.TapToStream.distribute_payment:
+    // smart_contracts/tap_to_stream/contract.py:47-54
+    // @arc4.abimethod()
+    // def distribute_payment(
+    //     self,
+    //     video_id: arc4.String,
+    //     viewer_address: arc4.Address,
+    //     usdc_amount: arc4.UInt64,
+    //     creator_address: arc4.Address,
+    // ) -> arc4.Bool:
+    proto 4 1
+    // smart_contracts/tap_to_stream/contract.py:55
+    // amount = usdc_amount.as_uint64()
+    frame_dig -2
+    btoi
+    // smart_contracts/tap_to_stream/contract.py:56
+    // creator_share = (amount * UInt64(95)) // UInt64(100)
+    dup
+    pushint 95
+    *
+    pushint 100
+    /
+    // smart_contracts/tap_to_stream/contract.py:57
+    // platform_share = amount - creator_share
+    swap
+    dig 1
+    -
+    // smart_contracts/tap_to_stream/contract.py:59-70
+    // itxn.submit_txns(
+    //     itxn.AssetTransfer(
+    //         xfer_asset=self.usdc_asset_id.value,
+    //         asset_receiver=creator_address.native,
+    //         asset_amount=creator_share,
+    //     ),
+    //     itxn.AssetTransfer(
+    //         xfer_asset=self.usdc_asset_id.value,
+    //         asset_receiver=self.platform_wallet.value,
+    //         asset_amount=platform_share,
+    //     ),
+    // )
+    itxn_begin
+    // smart_contracts/tap_to_stream/contract.py:61
+    // xfer_asset=self.usdc_asset_id.value,
+    intc_0 // 0
+    bytec_2 // "usdc_asset_id"
+    app_global_get_ex
+    assert // check self.usdc_asset_id exists
+    dig 2
+    itxn_field AssetAmount
+    frame_dig -1
+    itxn_field AssetReceiver
+    dup
+    itxn_field XferAsset
+    // smart_contracts/tap_to_stream/contract.py:60
+    // itxn.AssetTransfer(
+    pushint 4 // axfer
+    itxn_field TypeEnum
+    intc_0 // 0
+    itxn_field Fee
+    // smart_contracts/tap_to_stream/contract.py:65-69
+    // itxn.AssetTransfer(
+    //     xfer_asset=self.usdc_asset_id.value,
+    //     asset_receiver=self.platform_wallet.value,
+    //     asset_amount=platform_share,
+    // ),
+    itxn_next
+    // smart_contracts/tap_to_stream/contract.py:67
+    // asset_receiver=self.platform_wallet.value,
+    intc_0 // 0
+    bytec_0 // "platform_wallet"
+    app_global_get_ex
+    assert // check self.platform_wallet exists
+    dig 2
+    itxn_field AssetAmount
+    itxn_field AssetReceiver
+    itxn_field XferAsset
+    // smart_contracts/tap_to_stream/contract.py:65
+    // itxn.AssetTransfer(
+    pushint 4 // axfer
+    itxn_field TypeEnum
+    intc_0 // 0
+    itxn_field Fee
+    // smart_contracts/tap_to_stream/contract.py:59-70
+    // itxn.submit_txns(
+    //     itxn.AssetTransfer(
+    //         xfer_asset=self.usdc_asset_id.value,
+    //         asset_receiver=creator_address.native,
+    //         asset_amount=creator_share,
+    //     ),
+    //     itxn.AssetTransfer(
+    //         xfer_asset=self.usdc_asset_id.value,
+    //         asset_receiver=self.platform_wallet.value,
+    //         asset_amount=platform_share,
+    //     ),
+    // )
+    itxn_submit
+    // smart_contracts/tap_to_stream/contract.py:76
+    // creator_share=arc4.UInt64(creator_share),
+    swap
+    itob
+    // smart_contracts/tap_to_stream/contract.py:77
+    // platform_share=arc4.UInt64(platform_share),
+    swap
+    itob
+    // smart_contracts/tap_to_stream/contract.py:73-78
+    // PaymentDistributed(
+    //     video_id=video_id,
+    //     creator_address=creator_address,
+    //     creator_share=arc4.UInt64(creator_share),
+    //     platform_share=arc4.UInt64(platform_share),
+    // )
+    pushbytes 0x0032
+    frame_dig -1
+    concat
+    uncover 2
+    concat
+    swap
+    concat
+    frame_dig -4
+    concat
+    // smart_contracts/tap_to_stream/contract.py:72-79
+    // arc4.emit(
+    //     PaymentDistributed(
+    //         video_id=video_id,
+    //         creator_address=creator_address,
+    //         creator_share=arc4.UInt64(creator_share),
+    //         platform_share=arc4.UInt64(platform_share),
+    //     )
+    // )
+    pushbytes 0x63f4dffb // method "PaymentDistributed(string,address,uint64,uint64)"
+    swap
+    concat
+    log
+    // smart_contracts/tap_to_stream/contract.py:80
+    // return arc4.Bool(True)
+    pushbytes 0x80
+    retsub

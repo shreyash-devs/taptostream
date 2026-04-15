@@ -64,18 +64,22 @@ export function useX402() {
           network: string
           address: string
           videoId: string
+          assetId?: string
         }
 
         const platformWallet = required.address
         const amount = Number(required.price)
+        const requiredAssetId = required.assetId ? Number(required.assetId) : null
+        const paymentAssetId = requiredAssetId ?? usdcAssetId
         if (!platformWallet || !amount) throw new PaymentError('invalid_payment_required')
+        if (!paymentAssetId) throw new PaymentError('usdc_asset_id_not_configured')
 
         // 2) build USDC ASA transfer to platform wallet
         const suggestedParams = await algodClient.getTransactionParams().do()
         const txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
           sender: activeAddress,
           receiver: platformWallet,
-          assetIndex: usdcAssetId,
+          assetIndex: paymentAssetId,
           amount,
           suggestedParams,
         })

@@ -6,7 +6,12 @@ import { requirePayment } from './x402.js'
 import { getAllVideos, getSignedStreamUrl, getVideoData } from './stream.js'
 
 const app = express()
-app.use(cors())
+app.use(
+  cors({
+    exposedHeaders: ['X-PAYMENT-REQUIRED'],
+    allowedHeaders: ['Content-Type', 'X-PAYMENT'],
+  })
+)
 app.use(express.json({ limit: '1mb' }))
 
 app.get('/api/health', (req, res) => {

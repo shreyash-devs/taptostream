@@ -3,6 +3,7 @@ import path from 'node:path'
 import jwt from 'jsonwebtoken'
 
 const videosPath = path.join(process.cwd(), 'server', 'videos.json')
+const FALLBACK_HLS_URL = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8'
 
 function loadVideos() {
   return JSON.parse(fs.readFileSync(videosPath, 'utf-8'))
@@ -26,6 +27,11 @@ export async function getSignedStreamUrl(videoId) {
   }
 
   const { cfUid, title, creatorAddress, priceUSDC } = video
+
+  // Dev fallback: allow watch flow to complete without Cloudflare setup yet.
+  if (!cfUid || cfUid === 'YOUR_CF_STREAM_UID_HERE') {
+    return { streamUrl: FALLBACK_HLS_URL, title, creatorAddress, priceUSDC }
+  }
 
   const accountId = process.env.CF_ACCOUNT_ID
   const keyId = process.env.CF_STREAM_KEY_ID

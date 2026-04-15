@@ -14,6 +14,7 @@ export default function WatchModal({
   onClose: () => void
 }) {
   const { requestWatch } = useX402()
+  const requestWatchRef = useRef(requestWatch)
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const startedForRef = useRef<string | null>(null)
   const inFlightRef = useRef(false)
@@ -23,6 +24,10 @@ export default function WatchModal({
   const [streamUrl, setStreamUrl] = useState<string | null>(null)
 
   const heading = useMemo(() => title ?? 'Tap-to-Stream', [title])
+
+  useEffect(() => {
+    requestWatchRef.current = requestWatch
+  }, [requestWatch])
 
   useEffect(() => {
     if (!isOpen || !videoId) return
@@ -40,7 +45,7 @@ export default function WatchModal({
         // we can't reliably detect "wallet signing" vs "verification" from outside,
         // but we can present both stages in sequence around the signing call.
         setStage('sign')
-        const promise = requestWatch(videoId)
+        const promise = requestWatchRef.current(videoId)
         setStage('verifying')
         const result = await promise
         if (cancelled) return
@@ -58,7 +63,7 @@ export default function WatchModal({
     return () => {
       cancelled = true
     }
-  }, [isOpen, requestWatch, videoId])
+  }, [isOpen, videoId])
 
   useEffect(() => {
     if (!isOpen) {
@@ -76,6 +81,7 @@ export default function WatchModal({
     const video = videoRef.current
     if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = streamUrl
+      void video.play().catch(() => {})
       return
     }
 
@@ -88,6 +94,15 @@ export default function WatchModal({
     const hls = new Hls()
     hls.loadSource(streamUrl)
     hls.attachMedia(video)
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      void video.play().catch(() => {})
+    })
+    hls.on(Hls.Events.ERROR, (_event, data) => {
+      if (data?.fatal) {
+        setError('video_playback_failed')
+        setStage('error')
+      }
+    })
     return () => hls.destroy()
   }, [stage, streamUrl])
 
@@ -96,19 +111,19 @@ export default function WatchModal({
   return (
     <div className="fixed inset-0 z-50">
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
-      <div className="absolute inset-0 flex items-center justify-center p-4">
-        <div className="w-full max-w-3xl rounded-app border border-white/10 bg-bg-surface shadow-card overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
-            <div className="font-semibold">{heading}</div>
+      <div className="absolute inset-0 flex items-center justify-center p-0 sm:p-2">
+        <div className="w-full h-full sm:h-auto sm:max-h-[96vh] sm:max-w-[96vw] rounded-none sm:rounded-app border-0 sm:border border-white/10 bg-black shadow-card overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-bg-surface/85 backdrop-blur">
+            <div className="font-semibold text-sm sm:text-base truncate pr-2">{heading}</div>
             <button
-              className="rounded-app border border-white/10 px-3 py-1 text-sm text-text-secondary hover:text-text-primary hover:border-white/20 transition"
+              className="rounded-app border border-white/10 px-3 py-1 text-sm text-text-secondary hover:text-text-primary hover:border-white/20 transition shrink-0"
               onClick={onClose}
             >
               Close
             </button>
           </div>
 
-          <div className="p-5">
+          <div className="p-2 sm:p-4 bg-black">
             {stage !== 'playing' && (
               <div className="rounded-app border border-white/10 bg-bg-card p-4">
                 {stage === 'requesting' && <div>Requesting payment…</div>}
@@ -134,7 +149,14 @@ export default function WatchModal({
 
             {stage === 'playing' && (
               <div className="rounded-app border border-white/10 bg-black overflow-hidden">
-                <video ref={videoRef} controls className="w-full h-auto" />
+                <video
+                  ref={videoRef}
+                  controls
+                  autoPlay
+                  playsInline
+                  preload="metadata"
+                  className="w-full h-auto max-h-[88vh] bg-black"
+                />
               </div>
             )}
           </div>

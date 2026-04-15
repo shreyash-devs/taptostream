@@ -15,6 +15,9 @@ if (import.meta.env.VITE_ALGOD_NETWORK === 'localnet') {
         port: String(kmdConfig.port),
       },
     },
+    { id: WalletId.PERA },
+    { id: WalletId.DEFLY },
+    { id: WalletId.EXODUS },
   ]
 } else {
   supportedWallets = [
