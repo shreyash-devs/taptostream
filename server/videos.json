@@ -1,0 +1,9 @@
+{
+  "demo-video-001": {
+    "cfUid": "YOUR_CF_STREAM_UID_HERE",
+    "title": "Phase 1 Demo — Tap-to-Stream",
+    "creatorAddress": "YOUR_CREATOR_TEST_WALLET_ADDRESS",
+    "priceUSDC": 1000000
+  }
+}
+

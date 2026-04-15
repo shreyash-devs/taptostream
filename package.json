@@ -1,0 +1,17 @@
+{
+  "name": "tap-to-stream-phase1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "server": "node server/index.js",
+    "server:dev": "node --watch server/index.js"
+  },
+  "dependencies": {
+    "algosdk": "^3.5.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "x402-express": "^1.1.0"
+  }
+}

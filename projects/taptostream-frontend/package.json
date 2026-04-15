@@ -1,0 +1,68 @@
+{
+  "name": "taptostream-frontend",
+  "version": "0.1.0",
+  "author": {
+    "name": "John Doe",
+    "email": "my@mail.com"
+  },
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.0",
+    "npm": ">=9.0"
+  },
+  "devDependencies": {
+    "@algorandfoundation/algokit-client-generator": "^5.0.0",
+    "@tailwindcss/postcss": "^4.2.2",
+    "@types/node": "^18.17.14",
+    "@types/react": "^18.2.11",
+    "@types/react-dom": "^18.2.4",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.5.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6",
+    "vite": "^5.0.0",
+    "vite-plugin-node-polyfills": "^0.22.0"
+  },
+  "dependencies": {
+    "@algorandfoundation/algokit-utils": "^9.0.0",
+    "@blockshake/defly-connect": "^1.2.1",
+    "@perawallet/connect": "^1.4.1",
+    "@txnlab/use-wallet": "^4.0.0",
+    "@txnlab/use-wallet-react": "^4.0.0",
+    "algosdk": "^3.0.0",
+    "hls.js": "^1.6.16",
+    "notistack": "^3.0.1",
+    "postcss": "^8.5.9",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwindcss": "^4.2.2",
+    "tslib": "^2.6.2"
+  },
+  "scripts": {
+    "generate:app-clients": "echo \"skip: algokit not installed\"",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "overrides": {
+    "ws@>7.0.0 <7.5.9": "7.5.10"
+  }
+}
