@@ -108,81 +108,271 @@ export default function WatchModal({
 
   if (!isOpen) return null
 
+  /* ── Stage badge helper ──────────────────────────────────────────── */
+  const stageBadge = () => {
+    const base: React.CSSProperties = {
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '8px',
+      borderRadius: '9999px',
+      padding: '8px 22px',
+      fontSize: '0.85rem',
+      fontWeight: 600,
+      backdropFilter: 'blur(8px)',
+    }
+
+    if (stage === 'requesting') {
+      return (
+        <div
+          className="badge-status"
+          style={{
+            ...base,
+            border: '1px solid rgba(255,255,255,0.12)',
+            background: 'rgba(26,26,36,0.7)',
+            color: '#888899',
+          }}
+        >
+          <span>🔄</span> Requesting payment…
+        </div>
+      )
+    }
+    if (stage === 'sign') {
+      return (
+        <div
+          className="badge-status"
+          style={{
+            ...base,
+            border: '1px solid rgba(255,255,255,0.12)',
+            background: 'rgba(26,26,36,0.7)',
+            color: '#f0f0f0',
+          }}
+        >
+          <span>✍️</span> Sign in Pera Wallet…
+        </div>
+      )
+    }
+    if (stage === 'verifying') {
+      return (
+        <div
+          className="badge-status"
+          style={{
+            ...base,
+            border: '1px solid rgba(0,229,160,0.35)',
+            background: 'rgba(0,229,160,0.08)',
+            color: '#00e5a0',
+          }}
+        >
+          <span>⛓️</span> Verifying on Algorand…
+        </div>
+      )
+    }
+    if (stage === 'playing') {
+      return (
+        <div
+          style={{
+            ...base,
+            border: '1px solid rgba(0,229,160,0.3)',
+            background: 'rgba(0,229,160,0.08)',
+            color: '#00e5a0',
+          }}
+        >
+          <span>▶️</span> Playing stream
+        </div>
+      )
+    }
+    if (stage === 'error') {
+      return (
+        <div
+          style={{
+            ...base,
+            border: '1px solid rgba(239,68,68,0.35)',
+            background: 'rgba(239,68,68,0.1)',
+            color: '#fca5a5',
+          }}
+        >
+          <span>❌</span> {error ?? 'payment_failed'}
+        </div>
+      )
+    }
+    return null
+  }
+
   return (
-    <div className="fixed inset-0 z-50">
-      <div className="absolute inset-0 bg-black/70" onClick={onClose} />
-      <div className="absolute inset-0 flex items-center justify-center p-0 sm:p-2">
-        <div className="w-full h-full sm:h-auto sm:max-h-[96vh] sm:max-w-[96vw] rounded-none sm:rounded-app border-0 sm:border border-white/10 bg-black shadow-card overflow-hidden">
+    /* Full-screen dark overlay */
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 50,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      {/* Backdrop click to close */}
+      <div
+        aria-hidden
+        onClick={onClose}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'rgba(0,0,0,0.82)',
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
+          cursor: 'pointer',
+        }}
+      />
+
+      {/* Modal panel */}
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 1,
+          width: 'min(96vw, 1080px)',
+          maxHeight: '96vh',
+          borderRadius: '16px',
+          border: '1px solid rgba(255,255,255,0.09)',
+          background: '#0d0d14',
+          boxShadow: '0 25px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,229,160,0.05)',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Header bar */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '14px 20px',
+            borderBottom: '1px solid rgba(255,255,255,0.07)',
+            background: 'rgba(26,26,36,0.6)',
+            backdropFilter: 'blur(8px)',
+            flexShrink: 0,
+          }}
+        >
+          <div
+            style={{
+              fontWeight: 600,
+              fontSize: '0.95rem',
+              color: '#f0f0f0',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              paddingRight: '40px',
+            }}
+          >
+            {heading}
+          </div>
+
+          {/* Close × button */}
           <button
-            className="absolute top-4 right-4 z-10 rounded-full border border-white/10 bg-black/50 px-3 py-1 text-sm text-text-secondary hover:border-accent-green/60 hover:text-text-primary transition"
+            id="watch-modal-close"
             onClick={onClose}
             aria-label="Close"
+            style={{
+              position: 'absolute',
+              top: '12px',
+              right: '16px',
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              border: '1px solid rgba(255,255,255,0.12)',
+              background: 'rgba(0,0,0,0.5)',
+              color: '#888899',
+              fontSize: '1rem',
+              lineHeight: 1,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'border-color 0.2s, color 0.2s',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = 'rgba(0,229,160,0.6)'
+              e.currentTarget.style.color = '#f0f0f0'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'
+              e.currentTarget.style.color = '#888899'
+            }}
           >
-            X
+            ✕
           </button>
+        </div>
 
-          <div className="px-4 pt-6 pb-4 border-b border-white/10 bg-bg-surface/60 backdrop-blur">
-            <div className="font-semibold text-sm sm:text-base truncate pr-10">{heading}</div>
-          </div>
+        {/* Body */}
+        <div
+          style={{
+            flex: 1,
+            overflowY: 'auto',
+            background: '#080810',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            padding: '2rem 1rem',
+            gap: '1.25rem',
+          }}
+        >
+          {/* Video player (shown when playing) */}
+          {stage === 'playing' && (
+            <div
+              style={{
+                width: '90%',
+                borderRadius: '10px',
+                border: '1px solid rgba(255,255,255,0.08)',
+                overflow: 'hidden',
+                background: '#000',
+                boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
+              }}
+            >
+              <video
+                ref={videoRef}
+                controls
+                autoPlay
+                playsInline
+                preload="metadata"
+                style={{ width: '100%', height: 'auto', maxHeight: '70vh', display: 'block', background: '#000' }}
+              />
+            </div>
+          )}
 
-          <div className="p-2 sm:p-4 bg-black flex flex-col items-center">
-            {stage === 'playing' && (
-              <>
-                <div className="w-[90%] mt-2 rounded-app border border-white/10 bg-black overflow-hidden">
-                  <video
-                    ref={videoRef}
-                    controls
-                    autoPlay
-                    playsInline
-                    preload="metadata"
-                    className="w-full h-auto max-h-[88vh] bg-black"
-                  />
-                </div>
-                <div className="mt-3 rounded-full border border-accent-green/30 bg-accent-green/10 backdrop-blur px-5 py-2 text-accent-green font-semibold">
-                  Playing stream
-                </div>
-              </>
-            )}
+          {/* Status badge */}
+          {stageBadge()}
 
-            {stage !== 'playing' && (
-              <div className="mt-6 w-full flex flex-col items-center gap-3">
-                {stage === 'requesting' && (
-                  <div className="rounded-full border border-white/10 bg-bg-card/60 backdrop-blur px-5 py-2 text-text-secondary animate-pulseSoft">
-                    Requesting payment…
-                  </div>
-                )}
-                {stage === 'sign' && (
-                  <div className="rounded-full border border-white/10 bg-bg-card/60 backdrop-blur px-5 py-2 text-text-secondary animate-pulseSoft">
-                    Sign in Pera Wallet…
-                  </div>
-                )}
-                {stage === 'verifying' && (
-                  <div className="rounded-full border border-accent-green/40 bg-accent-green/10 backdrop-blur px-5 py-2 text-accent-green font-semibold animate-pulseSoft">
-                    Verifying on Algorand…
-                  </div>
-                )}
-                {stage === 'error' && (
-                  <>
-                    <div className="rounded-full border border-red-400/40 bg-red-500/10 backdrop-blur px-5 py-2 text-red-200 font-semibold">
-                      {error ?? 'payment_failed'}
-                    </div>
-                    <button
-                      className="mt-2 rounded-full border border-white/10 bg-bg-surface/60 backdrop-blur px-6 py-2 text-text-primary hover:border-accent-green/60 hover:bg-white/5 transition"
-                      onClick={() => {
-                        // re-trigger by closing and reopening handled by parent;
-                        onClose()
-                      }}
-                    >
-                      Try again
-                    </button>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
+          {/* Try again button on error */}
+          {stage === 'error' && (
+            <button
+              style={{
+                marginTop: '4px',
+                borderRadius: '9999px',
+                border: '1px solid rgba(255,255,255,0.12)',
+                background: 'rgba(26,26,36,0.8)',
+                color: '#f0f0f0',
+                padding: '8px 28px',
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                transition: 'border-color 0.2s, background 0.2s',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = 'rgba(0,229,160,0.6)'
+                e.currentTarget.style.background = 'rgba(0,229,160,0.06)'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'
+                e.currentTarget.style.background = 'rgba(26,26,36,0.8)'
+              }}
+              onClick={() => {
+                // re-trigger by closing and reopening handled by parent;
+                onClose()
+              }}
+            >
+              Try again
+            </button>
+          )}
         </div>
       </div>
     </div>
   )
 }
-

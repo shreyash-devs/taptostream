@@ -1,21 +1,38 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Mono:wght@400;700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  --bg-primary: #0a0a0f;
-  --bg-surface: #13131a;
-  --bg-card: #1a1a24;
-  --accent-green: #1D9E75;
-  --accent-green-light: #5DCAA5;
-  --text-primary: #f0efe9;
-  --text-secondary: #9c9a92;
-  --border: rgba(255, 255, 255, 0.08);
-  --radius: 12px;
+/* ── Custom design tokens (Tailwind v4 @theme) ─────────────────────────── */
+@theme {
+  --color-bg-primary:    #0a0a0f;
+  --color-bg-card:       #111118;
+  --color-bg-surface:    #1a1a24;
+  --color-accent-green:  #00e5a0;
+  --color-text-primary:  #f0f0f0;
+  --color-text-secondary:#888899;
+
+  --font-family-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-family-mono: 'Space Mono', ui-monospace, SFMono-Regular, monospace;
+
+  --radius-app: 12px;
+
+  --shadow-card: 0 10px 30px rgba(0,0,0,0.4);
+
+  --animate-pulse-soft: pulseSoft 1.4s ease-in-out infinite;
+  --animate-shimmer:    shimmer 2s linear infinite;
 }
 
+@keyframes pulseSoft {
+  0%, 100% { opacity: 0.55; }
+  50%       { opacity: 1;    }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+/* ── Base resets ───────────────────────────────────────────────────────── */
 html,
 body,
 #root {
@@ -23,8 +40,61 @@ body,
 }
 
 body {
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  background: var(--color-bg-primary, #0a0a0f);
+  color: var(--color-text-primary, #f0f0f0);
   font-family: 'DM Sans', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+/* ── Utility helpers not easily expressible in v4 inline ───────────────── */
+.gradient-logo {
+  background: linear-gradient(90deg, #00e5a0, #22d3ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-btn {
+  background: linear-gradient(90deg, #00e5a0, #22d3ee);
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+.gradient-btn:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.card-hover {
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: scale(1.025);
+  border-color: rgba(0, 229, 160, 0.55);
+  box-shadow: 0 0 24px rgba(0, 229, 160, 0.12);
+}
+
+.pulse-dot {
+  animation: pulseSoft 1.4s ease-in-out infinite;
+}
+
+.badge-status {
+  animation: pulseSoft 1.4s ease-in-out infinite;
+}
+
+/* Frosted glass panel */
+.glass-panel {
+  background: rgba(17, 17, 24, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Neon glow on accent-green focus */
+.neon-border:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 229, 160, 0.5);
+}

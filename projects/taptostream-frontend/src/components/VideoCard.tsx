@@ -26,36 +26,127 @@ export default function VideoCard({
     return `${a.slice(0, 6)}...${a.slice(-4)}`
   }, [video.creatorAddress])
 
+  const priceDisplay = useMemo(() => {
+    return '$' + (video.priceUSDC / 1_000_000).toFixed(2) + ' USDC'
+  }, [video.priceUSDC])
+
   return (
-    <div className="group rounded-xl border border-white/10 bg-bg-card/60 backdrop-blur shadow-card overflow-hidden transition-transform duration-200 hover:scale-[1.02] hover:border-accent-green/60">
-      <div className="relative aspect-video overflow-hidden bg-black/30">
+    <div
+      className="card-hover"
+      data-video-id={videoId}
+      style={{
+        borderRadius: '14px',
+        border: '1px solid rgba(255,255,255,0.08)',
+        background: 'rgba(17,17,24,0.8)',
+        backdropFilter: 'blur(6px)',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.35)',
+      }}
+    >
+      {/* Thumbnail */}
+      <div style={{ position: 'relative', aspectRatio: '16/9', overflow: 'hidden', background: '#000' }}>
         <img
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           src={thumbnailUrl}
           alt={video.title}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            transition: 'transform 0.35s ease',
+            display: 'block',
+          }}
+          onMouseEnter={e => { (e.currentTarget as HTMLImageElement).style.transform = 'scale(1.06)' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLImageElement).style.transform = 'scale(1)' }}
         />
 
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" />
+        {/* Dark gradient overlay at bottom */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 55%)',
+            pointerEvents: 'none',
+          }}
+        />
 
-        <div className="absolute right-3 top-3 rounded-full bg-accent-green px-3 py-1 font-mono text-xs text-black">
-          {'$' + (video.priceUSDC / 1_000_000).toFixed(2) + ' USDC'}
+        {/* Price badge — top right */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '12px',
+            right: '12px',
+            borderRadius: '9999px',
+            background: '#00e5a0',
+            color: '#000',
+            fontFamily: 'var(--font-family-mono, monospace)',
+            fontSize: '0.72rem',
+            fontWeight: 700,
+            padding: '3px 10px',
+            boxShadow: '0 2px 12px rgba(0,229,160,0.45)',
+            letterSpacing: '0.03em',
+          }}
+        >
+          {priceDisplay}
         </div>
       </div>
 
-      <div className="p-4">
-        <div className="min-w-0">
-          <div className="truncate text-text-primary font-semibold">{video.title}</div>
-          <div className="mt-1 font-mono text-xs text-text-secondary">by {creatorShort}</div>
+      {/* Card body */}
+      <div style={{ padding: '1rem 1.1rem 1.2rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        {/* Title */}
+        <div
+          style={{
+            color: '#f0f0f0',
+            fontWeight: 600,
+            fontSize: '0.95rem',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+          title={video.title}
+        >
+          {video.title}
         </div>
 
-        <button
-          className="mt-4 w-full rounded-lg bg-accent-green px-4 py-2 text-xs font-semibold text-black transition-colors hover:bg-gradient-to-r hover:from-accent-green hover:to-cyan-300"
-          onClick={() => onWatch(videoId)}
+        {/* Creator address */}
+        <div
+          style={{
+            fontFamily: 'var(--font-family-mono, monospace)',
+            fontSize: '0.72rem',
+            color: '#888899',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
         >
-          Watch Now
+          by {creatorShort}
+        </div>
+
+        {/* Watch Now button */}
+        <button
+          id={`watch-btn-${videoId}`}
+          className="gradient-btn"
+          onClick={() => onWatch(videoId)}
+          style={{
+            marginTop: '14px',
+            width: '100%',
+            borderRadius: '9px',
+            border: 'none',
+            padding: '9px 0',
+            fontSize: '0.82rem',
+            fontWeight: 700,
+            letterSpacing: '0.04em',
+            color: '#000',
+            cursor: 'pointer',
+            background: 'linear-gradient(90deg, #00e5a0, #22d3ee)',
+            boxShadow: '0 4px 16px rgba(0,229,160,0.25)',
+          }}
+        >
+          Watch Now →
         </button>
       </div>
     </div>
   )
 }
-
