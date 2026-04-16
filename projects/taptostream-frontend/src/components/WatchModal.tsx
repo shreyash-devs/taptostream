@@ -113,28 +113,61 @@ export default function WatchModal({
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
       <div className="absolute inset-0 flex items-center justify-center p-0 sm:p-2">
         <div className="w-full h-full sm:h-auto sm:max-h-[96vh] sm:max-w-[96vw] rounded-none sm:rounded-app border-0 sm:border border-white/10 bg-black shadow-card overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-bg-surface/85 backdrop-blur">
-            <div className="font-semibold text-sm sm:text-base truncate pr-2">{heading}</div>
-            <button
-              className="rounded-app border border-white/10 px-3 py-1 text-sm text-text-secondary hover:text-text-primary hover:border-white/20 transition shrink-0"
-              onClick={onClose}
-            >
-              Close
-            </button>
+          <button
+            className="absolute top-4 right-4 z-10 rounded-full border border-white/10 bg-black/50 px-3 py-1 text-sm text-text-secondary hover:border-accent-green/60 hover:text-text-primary transition"
+            onClick={onClose}
+            aria-label="Close"
+          >
+            X
+          </button>
+
+          <div className="px-4 pt-6 pb-4 border-b border-white/10 bg-bg-surface/60 backdrop-blur">
+            <div className="font-semibold text-sm sm:text-base truncate pr-10">{heading}</div>
           </div>
 
-          <div className="p-2 sm:p-4 bg-black">
+          <div className="p-2 sm:p-4 bg-black flex flex-col items-center">
+            {stage === 'playing' && (
+              <>
+                <div className="w-[90%] mt-2 rounded-app border border-white/10 bg-black overflow-hidden">
+                  <video
+                    ref={videoRef}
+                    controls
+                    autoPlay
+                    playsInline
+                    preload="metadata"
+                    className="w-full h-auto max-h-[88vh] bg-black"
+                  />
+                </div>
+                <div className="mt-3 rounded-full border border-accent-green/30 bg-accent-green/10 backdrop-blur px-5 py-2 text-accent-green font-semibold">
+                  Playing stream
+                </div>
+              </>
+            )}
+
             {stage !== 'playing' && (
-              <div className="rounded-app border border-white/10 bg-bg-card p-4">
-                {stage === 'requesting' && <div>Requesting payment…</div>}
-                {stage === 'sign' && <div>Sign in Pera Wallet…</div>}
-                {stage === 'verifying' && <div className="animate-pulseSoft">Verifying on Algorand…</div>}
+              <div className="mt-6 w-full flex flex-col items-center gap-3">
+                {stage === 'requesting' && (
+                  <div className="rounded-full border border-white/10 bg-bg-card/60 backdrop-blur px-5 py-2 text-text-secondary animate-pulseSoft">
+                    Requesting payment…
+                  </div>
+                )}
+                {stage === 'sign' && (
+                  <div className="rounded-full border border-white/10 bg-bg-card/60 backdrop-blur px-5 py-2 text-text-secondary animate-pulseSoft">
+                    Sign in Pera Wallet…
+                  </div>
+                )}
+                {stage === 'verifying' && (
+                  <div className="rounded-full border border-accent-green/40 bg-accent-green/10 backdrop-blur px-5 py-2 text-accent-green font-semibold animate-pulseSoft">
+                    Verifying on Algorand…
+                  </div>
+                )}
                 {stage === 'error' && (
-                  <div>
-                    <div className="text-red-300 font-semibold">Error</div>
-                    <div className="text-text-secondary mt-1">{error}</div>
+                  <>
+                    <div className="rounded-full border border-red-400/40 bg-red-500/10 backdrop-blur px-5 py-2 text-red-200 font-semibold">
+                      {error ?? 'payment_failed'}
+                    </div>
                     <button
-                      className="mt-4 rounded-app border border-white/10 bg-bg-surface hover:border-white/20 hover:bg-white/5 transition px-4 py-2"
+                      className="mt-2 rounded-full border border-white/10 bg-bg-surface/60 backdrop-blur px-6 py-2 text-text-primary hover:border-accent-green/60 hover:bg-white/5 transition"
                       onClick={() => {
                         // re-trigger by closing and reopening handled by parent;
                         onClose()
@@ -142,21 +175,8 @@ export default function WatchModal({
                     >
                       Try again
                     </button>
-                  </div>
+                  </>
                 )}
-              </div>
-            )}
-
-            {stage === 'playing' && (
-              <div className="rounded-app border border-white/10 bg-black overflow-hidden">
-                <video
-                  ref={videoRef}
-                  controls
-                  autoPlay
-                  playsInline
-                  preload="metadata"
-                  className="w-full h-auto max-h-[88vh] bg-black"
-                />
               </div>
             )}
           </div>
