@@ -1,59 +1,29 @@
-import { SupportedWallet, WalletId, WalletManager, WalletProvider } from '@txnlab/use-wallet-react'
-import { SnackbarProvider } from 'notistack'
-import Home from './Home'
-import { getAlgodConfigFromViteEnvironment, getKmdConfigFromViteEnvironment } from './utils/network/getAlgoClientConfigs'
-
-let supportedWallets: SupportedWallet[]
-if (import.meta.env.VITE_ALGOD_NETWORK === 'localnet') {
-  const kmdConfig = getKmdConfigFromViteEnvironment()
-  supportedWallets = [
-    {
-      id: WalletId.KMD,
-      options: {
-        baseServer: kmdConfig.server,
-        token: String(kmdConfig.token),
-        port: String(kmdConfig.port),
-      },
-    },
-    { id: WalletId.PERA },
-    { id: WalletId.DEFLY },
-    { id: WalletId.EXODUS },
-  ]
-} else {
-  supportedWallets = [
-    { id: WalletId.DEFLY },
-    { id: WalletId.PERA },
-    { id: WalletId.EXODUS },
-    // If you are interested in WalletConnect v2 provider
-    // refer to https://github.com/TxnLab/use-wallet for detailed integration instructions
-  ]
-}
+import { useState } from 'react'
+import WalletButton from './components/WalletButton'
+import TabNav from './components/TabNav'
+import ViewerPage from './pages/ViewerPage'
+import CreatorPage from './pages/CreatorPage'
 
 export default function App() {
-  const algodConfig = getAlgodConfigFromViteEnvironment()
-
-  const walletManager = new WalletManager({
-    wallets: supportedWallets,
-    defaultNetwork: algodConfig.network,
-    networks: {
-      [algodConfig.network]: {
-        algod: {
-          baseServer: algodConfig.server,
-          port: algodConfig.port,
-          token: String(algodConfig.token),
-        },
-      },
-    },
-    options: {
-      resetNetwork: true,
-    },
-  })
+  const [activeTab, setActiveTab] = useState<'viewer' | 'creator'>('viewer')
 
   return (
-    <SnackbarProvider maxSnack={3}>
-      <WalletProvider manager={walletManager}>
-        <Home />
-      </WalletProvider>
-    </SnackbarProvider>
+    <div className="min-h-screen bg-[#0A0A0A] text-[#F0F0F0]">
+      <header className="h-14 border-b border-[#2A2A2A] bg-[#0A0A0A]">
+        <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4">
+          <div className="font-mono text-[#00D4AA]">Tap-to-Stream</div>
+          <WalletButton />
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-7xl">
+        <TabNav activeTab={activeTab} onTabChange={setActiveTab} />
+        {activeTab === 'viewer' ? (
+          <ViewerPage />
+        ) : (
+          <CreatorPage onUploadComplete={() => setActiveTab('viewer')} />
+        )}
+      </main>
+    </div>
   )
 }

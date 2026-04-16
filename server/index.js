@@ -9,7 +9,7 @@ const app = express()
 app.use(
   cors({
     exposedHeaders: ['X-PAYMENT-REQUIRED'],
-    allowedHeaders: ['Content-Type', 'X-PAYMENT'],
+    allowedHeaders: ['Content-Type', 'X-PAYMENT', 'X-Wallet-Address'],
   })
 )
 app.use(express.json({ limit: '1mb' }))
