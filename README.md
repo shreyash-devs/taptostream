@@ -139,7 +139,7 @@ Use templates as a starting point:
 ## 👨‍💻 Author
 
 Made with ❤️ by **Shreyash-devs**  
-A passionate developer who enjoys turning ideas into reality using Flutter, Firebase, and a touch of creativity.
+A passionate developer who enjoys turning ideas into reality using tech and a touch of creativity.
 
 - 🔗 [LinkedIn](https://www.linkedin.com/in/shreyashdubewar)  
 - 📱 [GitHub](https://github.com/shreyash-devs)  
