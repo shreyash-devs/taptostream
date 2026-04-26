@@ -1,4 +1,4 @@
-# TapToStream
+# TapToStream 🎬
 
 TapToStream is an Algorand-powered **pay-per-view video streaming platform**.  
 Instead of subscriptions, users pay per video in USDC, and payouts are split on-chain between creator and platform.
@@ -32,11 +32,11 @@ The viewer only gets the stream URL after payment is validated.
 
 ```mermaid
 flowchart LR
-    A[Viewer / Wallet User] --> B[React Frontend]
-    B --> C[Backend API Server]
-    C --> D[Algorand Network]
-    C --> E[TapToStream Smart Contract]
-    C --> F[Cloudflare Stream]
+    A[👤 Viewer / Wallet User] --> B[🖥 React Frontend]
+    B --> C[⚙ Backend API Server]
+    C --> D[⛓ Algorand Network]
+    C --> E[📜 TapToStream Smart Contract]
+    C --> F[📺 Cloudflare Stream]
     E --> D
 ```
 
@@ -67,102 +67,50 @@ sequenceDiagram
 
 ---
 
-## Tech Stack
+## Tech Stack 🧰
 
-### Frontend
-- React 18 + TypeScript + Vite
-- Tailwind CSS
-- `hls.js` for HLS playback
-- Wallet integration via `@txnlab/use-wallet-react` (Pera, Defly, Exodus)
-- `algosdk` and `@algorandfoundation/algokit-utils`
-
-### Backend
-- Node.js + Express
-- CORS + dotenv + JWT
-- `algosdk` for transaction verification and blockchain interaction
-
-### Smart Contracts
-- Algorand Python (Puya / AlgoKit smart contract pipeline)
-- ARC-56 artifacts for typed client generation
-
-### Tooling
-- AlgoKit workspace orchestration
-- Poetry (contracts project)
-- npm scripts for frontend/backend workflows
+| Layer | Technology | Purpose |
+|---|---|---|
+| Frontend | React 18 + TypeScript + Vite | UI, routing, wallet-first user experience |
+| Styling | Tailwind CSS | Fast and consistent UI styling |
+| Video Playback | `hls.js` | HLS streaming support in browser |
+| Wallet Integration | `@txnlab/use-wallet-react` | Pera, Defly, Exodus wallet connectivity |
+| Backend | Node.js + Express | Payment-gated API and stream unlock orchestration |
+| Auth/Signing | `jsonwebtoken` | Signed stream URL / token flow |
+| Blockchain SDK | `algosdk` | Txn creation, verification, Algorand interaction |
+| Smart Contracts | Algorand Python (Puya) | On-chain payment split logic |
+| Contract Artifacts | ARC-56 | Typed client generation and ABI integration |
+| Workspace Tooling | AlgoKit | Build/deploy orchestration across projects |
+| Python Tooling | Poetry | Contract environment and dependency management |
+| JavaScript Tooling | npm scripts | Frontend/backend command workflows |
 
 ---
 
-## Project Structure
+## Project Structure (Architecture View) 🏗
 
-```text
-taptostream/
-├─ server/                         # Express API + payment middleware + stream logic
-├─ projects/
-│  ├─ taptostream-contracts/       # Algorand smart contracts and deployment scripts
-│  └─ taptostream-frontend/        # React frontend application
-├─ .algokit.toml                   # Workspace command orchestration
-└─ README.md
-```
+```mermaid
+flowchart TB
+    A[taptostream]
+    A --> B[server]
+    A --> C[projects]
+    A --> D[.algokit.toml]
+    A --> E[README.md]
 
----
+    B --> B1[index.js]
+    B --> B2[x402.js]
+    B --> B3[stream.js]
+    B --> B4[videos.json]
 
-## API Endpoints
+    C --> C1[taptostream-contracts]
+    C --> C2[taptostream-frontend]
 
-- `GET /api/health` - health check
-- `GET /api/videos` - list available videos and metadata
-- `GET /api/watch/:videoId` - protected watch endpoint (payment-gated)
+    C1 --> C11[smart_contracts]
+    C1 --> C12[deploy scripts]
+    C1 --> C13[artifacts ARC-56]
 
----
-
-## On-Chain and Off-Chain Data Model
-
-### Off-chain
-- `server/videos.json` stores:
-  - `videoId`
-  - `title`
-  - `cfUid`
-  - `creatorAddress`
-  - `priceUSDC`
-
-### On-chain (Contract State)
-- global values for:
-  - platform wallet
-  - USDC asset id
-- payment split logic executed in contract method calls
-
----
-
-## Local Setup
-
-### Prerequisites
-- [AlgoKit CLI](https://github.com/algorandfoundation/algokit-cli)
-- [Docker](https://www.docker.com/) (for localnet)
-- Node.js 18+ and npm
-- Python 3.12+ and Poetry
-
-### 1) Bootstrap Workspace
-
-```bash
-algokit project bootstrap all
-```
-
-### 2) Build Everything
-
-```bash
-algokit project run build
-```
-
-### 3) Run Backend
-
-```bash
-npm run server
-```
-
-### 4) Run Frontend
-
-```bash
-cd projects/taptostream-frontend
-npm run dev
+    C2 --> C21[src]
+    C2 --> C22[hooks]
+    C2 --> C23[components]
 ```
 
 ---
@@ -188,16 +136,11 @@ Use templates as a starting point:
 
 ---
 
-## Related Docs
+## 👨‍💻 Author
 
-- Smart contracts: [`projects/taptostream-contracts/README.md`](projects/taptostream-contracts/README.md)
-- Frontend app: [`projects/taptostream-frontend/README.md`](projects/taptostream-frontend/README.md)
+Made with ❤️ by **Shreyash-devs**  
+A passionate developer who enjoys turning ideas into reality using Flutter, Firebase, and a touch of creativity.
 
----
-
-## Roadmap (Suggested)
-
-- add complete backend/contract/frontend test coverage
-- move video metadata from JSON to a persistent database
-- improve payment replay/idempotency protections
-- add CI workflows for build, lint, and tests
+- 🔗 [LinkedIn](https://www.linkedin.com/in/shreyashdubewar)  
+- 📱 [GitHub](https://github.com/shreyash-devs)  
+- ✉️ shreyashdevs.work@gmail.com
